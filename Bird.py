@@ -30,15 +30,21 @@ class Bird:
     def move(self):
         self.tick_count += 1
 
-        d = self.vel*self.tick_count + 1.5*self.tick_count**2
-        if d >= 16:
-            d = 16
-        if d < 0:
-            d -= 2
+        gravity = 0.8
+        air_resistance = 0.95
+        max_fall_speed = 10
 
-        self.y += d
+        self.vel += gravity
 
-        if d < 0 or self.y < self.height + 50:
+        if self.vel > 0:
+            self.vel *= air_resistance
+
+        if self.vel > max_fall_speed:
+            self.vel = max_fall_speed
+
+        self.y += self.vel
+
+        if self.vel < 0 or self.y < self.height + 50:
             if self.tilt < self.MAX_ROTATION:
                 self.tilt = self.MAX_ROTATION
         else:
