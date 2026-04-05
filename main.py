@@ -14,7 +14,7 @@ pygame.display.set_caption("Flappy Bird GA")
 
 WIN_WIDTH = 400
 WIN_HEIGHT = 700
-POPULATION_SIZE = 20
+POPULATION_SIZE = 100
 MAX_GENERATIONS = 50
 
 BASE_DIR = os.path.dirname(__file__)
