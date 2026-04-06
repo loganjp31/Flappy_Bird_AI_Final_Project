@@ -54,6 +54,21 @@ def draw_window(win, agents, pipes, base, score, generation, best_fitness):
     pygame.display.flip()
 
 
+def draw_pause_text(win):
+    pause_font = pygame.font.SysFont("comicsans", 50)
+    text = pause_font.render("PAUSED", True, (255, 0, 0))
+
+    win.blit(
+        text,
+        (
+            WIN_WIDTH // 2 - text.get_width() // 2,
+            WIN_HEIGHT // 2 - text.get_height() // 2,
+        ),
+    )
+
+    pygame.display.update()
+
+
 def reset_game(genomes):
     for g in genomes:
         g.fitness = 0.0
@@ -75,6 +90,7 @@ def reset_game(genomes):
 
 async def run_generation(win, clock, genomes, generation, best_fitness_so_far):
     agents, base, pipes, score = reset_game(genomes)
+    paused = False
 
     while True:
         clock.tick(30)
@@ -83,6 +99,25 @@ async def run_generation(win, clock, genomes, generation, best_fitness_so_far):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 raise SystemExit
+            
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_p:
+                paused = not paused
+
+        if paused:
+            draw_window(
+                win,
+                agents,
+                pipes,
+                base,
+                score,
+                generation,
+                best_fitness_so_far,
+            )
+
+            draw_pause_text(win)
+
+            await asyncio.sleep(0)
+            continue
 
         alive_agents = [agent for agent in agents if agent.alive]
         if not alive_agents:
