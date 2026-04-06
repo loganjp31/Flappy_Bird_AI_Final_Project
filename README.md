@@ -1,75 +1,140 @@
-# Flappy Bird AI Using a Genetic Algorithm
+# Flappy Bird AI Using NEAT
 
 ## Overview
 
-This project implements an AI-controlled version of Flappy Bird using a Genetic Algorithm. Instead of manual input, a population of agents learns to play the game by evolving decision-making parameters over multiple generations. The objective is to maximize survival time and the number of pipes successfully passed.
+This project implements an AI-controlled version of Flappy Bird using **NEAT (NeuroEvolution of Augmenting Topologies)**. Instead of manually controlling the bird, a population of agents evolves over multiple generations to learn how to play the game.
+
+Unlike a traditional Genetic Algorithm with a fixed neural network, NEAT allows both the **weights and the structure of the neural network** to evolve. This enables the system to discover increasingly complex strategies over time.
 
 ---
 
 ## Features
 
-- Fully functional Flappy Bird game environment
-- AI-controlled agents
-- Genetic Algorithm for learning and optimization
-- Fitness-based evolution across generations
-- Real-time simulation and scoring
+- Fully functional Flappy Bird game built with Pygame  
+- AI-controlled agents using NEAT  
+- Evolving neural network topology (not fixed)  
+- Speciation to protect innovation  
+- Elitism to preserve top-performing agents  
+- Custom fitness function based on survival, performance, and positioning  
+- Real-time simulation with generation tracking  
+- Pause functionality for debugging and observation  
 
 ---
 
 ## AI Approach
 
-Each agent makes decisions based on the current state of the game. The input features used for decision-making are:
+Each agent is controlled by a neural network that evolves over time.
 
-- Bird height
-- Bird vertical velocity
-- Horizontal distance to the next pipe
-- Pipe gap position
-- Bias term
+### Inputs
 
-At each frame, a decision score is computed using weighted inputs. If the score exceeds a threshold, the bird performs a jump action.
+The neural network receives the following inputs:
 
-### Actions
-- Jump
-- Do nothing
+- Bird height (`bird_y`)  
+- Bird vertical velocity (`bird_vel`)  
+- Horizontal distance to the next pipe (`pipe_dist`)  
+- Vertical position of the pipe gap (`gap_y`)  
+- Bias term  
 
-### Fitness Function
+### Output
 
-The performance of each agent is evaluated using the following fitness criteria:
+- A single output node determines whether the bird should:
+  - **Jump** (if output > threshold)
+  - **Do nothing**
 
-- +5 for passing a pipe
-- -2 for colliding with the ground
-- -2 for colliding with a pipe
-- +0.1 for every second survived
+---
 
-### Genetic Algorithm Process
+## NEAT Implementation
 
-1. Initialize a population of agents with random weights  
-2. Evaluate each agent based on its fitness  
-3. Select parent agents using fitness-proportional selection  
-4. Perform crossover to combine parent weights  
-5. Apply mutation with a small probability  
-6. Generate a new population  
-7. Repeat over multiple generations  
+This project implements a simplified version of NEAT with the following components:
+
+### Genome Representation
+
+Each genome consists of:
+
+- **Node genes**
+  - Input, hidden, output, and bias nodes  
+- **Connection genes**
+  - Weighted connections between nodes  
+  - Enabled/disabled state  
+  - Innovation numbers for tracking  
+
+### Key NEAT Features
+
+- **Structural mutation**
+  - Add connection
+  - Add node (splitting existing connections)
+
+- **Weight mutation**
+  - Random perturbation or reassignment of weights  
+
+- **Crossover**
+  - Matching genes aligned by innovation numbers  
+  - Excess/disjoint genes inherited from the fitter parent  
+
+- **Speciation**
+  - Genomes grouped by similarity  
+  - Prevents new structures from being eliminated too early  
+
+- **Elitism**
+  - Top-performing genomes are preserved across generations  
+
+---
+
+## Fitness Function
+
+The fitness of each agent is calculated at the end of each generation using:
+```
+fitness = frames_survived + (pipes_passed * 150) - (abs(bird.y - gap_center) * 0.1)
+```
+
+
+
+### Explanation
+
+- **Frames survived** → rewards staying alive  
+- **Pipes passed × 150** → strongly rewards progress  
+- **Distance from gap penalty** → encourages stable positioning  
+
+This creates a balanced objective that promotes both survival and intelligent movement.
 
 ---
 
 ## System Design
 
-The system is composed of the following core components:
+The system consists of the following components:
 
-- **Game Engine**: Handles rendering, physics, collision detection, and scoring  
-- **Agent (Bird)**: Represents an individual with decision-making weights and fitness  
-- **Environment (Pipes and Ground)**: Generates obstacles and updates positions  
-- **Genetic Algorithm Module**: Manages selection, crossover, mutation, and evolution  
+- **Game Engine**
+  - Handles rendering, physics, and collisions  
+
+- **Agent**
+  - Wraps the bird and its neural network (genome)  
+
+- **Genome**
+  - Represents the neural network structure and weights  
+
+- **Population**
+  - Manages evolution, speciation, and reproduction  
+
+- **Environment**
+  - Pipes and ground mechanics  
 
 ### Data Flow
 
-1. The game updates the environment and agent states  
-2. Each agent observes the current game state  
-3. The agent computes a decision and acts  
-4. The environment updates based on the action  
-5. Fitness is updated continuously  
-6. Once all agents fail, a new generation is created  
+1. The environment updates (pipes, ground, positions)  
+2. Each agent observes the current state  
+3. The neural network computes an action  
+4. The bird performs the action  
+5. Statistics are tracked (frames survived, pipes passed)  
+6. Fitness is calculated after all agents fail  
+7. Population evolves into the next generation  
+
+---
+
+## Controls
+
+- **P** → Pause / Unpause the simulation  
+
+The system is otherwise fully AI-controlled.
 
 ---
 
@@ -124,10 +189,6 @@ pygbag .
 
 Open the generated local server URL in a browser to view the simulation.
 
-## Controls
-
-The system is fully AI-controlled. No manual input is required during execution.
-
 ## Course Context
 
 This project was developed for SOFE3720: Introduction to Artificial Intelligence. It demonstrates the application of AI techniques to a dynamic environment, including problem formulation, algorithm implementation, system design, and performance evaluation.
@@ -144,3 +205,8 @@ Sharujan Sivanandam
 ## License
 
 This project is intended for academic use.
+
+## References
+
+- Original Flappy Bird game implementation (game and image foulders):
+  https://github.com/siddharth-movaliya/Flappy-Bird-AI
