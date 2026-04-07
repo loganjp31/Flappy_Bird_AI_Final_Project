@@ -1,5 +1,6 @@
 import asyncio
 import os
+import random
 import pygame
 
 from game.Pipe import Pipe
@@ -13,7 +14,7 @@ pygame.display.set_caption("Flappy Bird NEAT")
 
 WIN_WIDTH = 400
 WIN_HEIGHT = 700
-POPULATION_SIZE = 100
+POPULATION_SIZE = 20
 MAX_GENERATIONS = 50
 
 BASE_DIR = os.path.dirname(__file__)
@@ -26,7 +27,7 @@ BG_IMG = pygame.transform.scale_by(
 STAT_FONT = pygame.font.SysFont("comicsans", 25)
 
 
-def draw_window(win, agents, pipes, base, score, generation, best_fitness):
+def draw_window(win, agents, pipes, base, score, generation, best_fitness,current_fitness):
     win.blit(BG_IMG, (0, 0))
 
     for pipe in pipes:
@@ -42,8 +43,11 @@ def draw_window(win, agents, pipes, base, score, generation, best_fitness):
     alive_text = STAT_FONT.render(f"Alive: {alive_count}", True, (255, 255, 255))
     win.blit(alive_text, (10, 40))
 
+    current_text = STAT_FONT.render(f"Current: {current_fitness:.2f}", True, (255, 255, 255))
+    win.blit(current_text, (10, 70))
+
     best_text = STAT_FONT.render(f"Best: {best_fitness:.2f}", True, (255, 255, 255))
-    win.blit(best_text, (10, 70))
+    win.blit(best_text, (10, 100))
 
     base.draw(win)
 
@@ -162,7 +166,8 @@ async def run_generation(win, clock, genomes, generation, best_fitness_so_far):
 
         if add_pipe:
             score += 1
-            pipes.append(Pipe(450))
+            new_x = pipes[-1].x + random.randint(220, 320)
+            pipes.append(Pipe(new_x))
 
             for agent in agents:
                 if agent.alive:
@@ -194,6 +199,12 @@ async def run_generation(win, clock, genomes, generation, best_fitness_so_far):
 
         base.move()
 
+        alive_agents = [agent for agent in agents if agent.alive]
+
+        current_fitness = 0.0
+        if alive_agents:
+            current_fitness = max(agent.genome.fitness for agent in alive_agents)
+
         current_best = max(agent.genome.fitness for agent in agents)
         draw_window(
             win,
@@ -203,6 +214,7 @@ async def run_generation(win, clock, genomes, generation, best_fitness_so_far):
             score,
             generation,
             max(best_fitness_so_far, current_best),
+            current_fitness,
         )
 
         await asyncio.sleep(0)

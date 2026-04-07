@@ -1,5 +1,5 @@
 from game.Bird import Bird
-from ai.Genome import Genome
+from neatAI.Genome import Genome
 
 
 class Agent:
@@ -15,7 +15,8 @@ class Agent:
         bird_y = self.bird.y
         bird_vel = self.bird.vel
         pipe_dist = next_pipe.x - self.bird.x
-        gap_y = next_pipe.height
+        gap_center = next_pipe.height + next_pipe.GAP / 2
+        vertical_offset = self.bird.y - gap_center
 
-        if self.genome.forward(bird_y, bird_vel, pipe_dist, gap_y):
+        if self.genome.forward(bird_y, bird_vel, pipe_dist, vertical_offset):
             self.bird.jump()

@@ -45,14 +45,14 @@ class Genome:
         new_genome.adjusted_fitness = 0.0
         return new_genome
 
-    def forward(self, bird_y, bird_vel, pipe_dist, gap_y):
+    def forward(self, bird_y, bird_vel, pipe_dist, vertical_offset):
         for node in self.nodes.values():
             node.value = 0.0
 
         self.nodes[0].value = bird_y / 700.0
         self.nodes[1].value = bird_vel / 10.0
         self.nodes[2].value = pipe_dist / 400.0
-        self.nodes[3].value = gap_y / 700.0
+        self.nodes[3].value = vertical_offset / 350.0
         self.nodes[4].value = 1.0
 
         ordered_nodes = sorted(self.nodes.values(), key=lambda n: (n.layer, n.id))

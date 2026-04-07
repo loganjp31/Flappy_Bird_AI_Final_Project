@@ -6,11 +6,11 @@ PIPE_IMG = pygame.transform.scale_by(surface=pygame.image.load(os.path.join("ima
 
 
 class Pipe:
-    GAP = 200
     VEL = 5
 
     def __init__(self, x):
         self.x = x
+        self.GAP = random.randrange(170, 230)
         self.height = 0
         self.top = 0
         self.bottom = 0
