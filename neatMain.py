@@ -116,6 +116,7 @@ async def run_generation(win, clock, genomes, generation, best_fitness_so_far):
                 score,
                 generation,
                 best_fitness_so_far,
+                current_fitness
             )
 
             draw_pause_text(win)
